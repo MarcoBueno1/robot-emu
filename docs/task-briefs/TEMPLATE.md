@@ -68,6 +68,6 @@ other implementers will code against these — they are not suggestions.>
 
 ## 8. Notes for the Implementer
 
-<Anything a fresh contributor session should know that doesn't fit
+<Anything a fresh LLM/contributor session should know that doesn't fit
 elsewhere: known traps, decisions already made and why, what NOT to read
 (e.g. "you do not need docs/task-briefs/phase-03-*.md for this phase").>

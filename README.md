@@ -2,7 +2,7 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Design phase — Phase 1 (core data model) not yet implemented. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phase 1 (core data model) implemented. Phase 2 (controller state machine) not yet started. See [Roadmap](#roadmap).
 
 ---
 
@@ -33,7 +33,7 @@ Full rationale in [`docs/architecture.md`](docs/architecture.md).
 | Document | Purpose |
 |---|---|
 | [`docs/architecture.md`](docs/architecture.md) | Full technical design: architecture, requirements, protocol, safety, roadmap |
-| [`docs/task-briefs/`](docs/task-briefs/) | Self-contained, phase-by-phase implementation briefs — each one is written so it can be handed to a contributor without needing the rest of the project history |
+| [`docs/task-briefs/`](docs/task-briefs/) | Self-contained, phase-by-phase implementation briefs — each one is written so it can be handed to a contributor or an LLM without needing the rest of the project history |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Coding standards, header policy, and how the phase/task-brief workflow works |
 
 ---
@@ -44,7 +44,7 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 
 | Phase | Deliverable | Brief |
 |---|---|---|
-| 1 | Core: `Robot` with N `Joint`s (position, velocity, limits) | [`phase-01-core.md`](docs/task-briefs/phase-01-core.md) |
+| 1 | ✅ Core: `Robot` with N `Joint`s (position, velocity, limits) | [`phase-01-core.md`](docs/task-briefs/phase-01-core.md) |
 | 2 | Controller state machine | _not written yet_ |
 | 3 | Deterministic real-time control loop (1 kHz) | _not written yet_ |
 | 4 | Motion: trajectory, velocity, acceleration | _not written yet_ |

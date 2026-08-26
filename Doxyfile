@@ -1,0 +1,62 @@
+# -----------------------------------------------------------------------------
+# Robot Emulator Framework — Doxygen configuration
+# -----------------------------------------------------------------------------
+# Author:   Marco Bueno
+# Email:    bueno.marco@gmail.com
+# LinkedIn: https://www.linkedin.com/in/marco-bueno-44417981/
+# License:  MIT (see LICENSE file at project root)
+# -----------------------------------------------------------------------------
+# This is a curated subset of Doxygen's settings, not the full generated
+# template (`doxygen -g`) — only the options that matter for this project are
+# listed explicitly; everything else uses Doxygen's built-in defaults.
+#
+# Usage:
+#   doxygen Doxyfile
+#   open docs/generated/html/index.html
+#
+# Or, if configured via CMake (see CMakeLists.txt):
+#   cmake --build build --target docs
+# -----------------------------------------------------------------------------
+
+PROJECT_NAME           = "Robot Emulator Framework"
+PROJECT_BRIEF          = "High-performance industrial robot controller emulator in modern C++"
+
+OUTPUT_DIRECTORY       = docs/generated
+
+# --- Input ---
+INPUT                  = include src README.md
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp *.cpp *.md
+USE_MDFILE_AS_MAINPAGE = README.md
+
+# --- Extraction ---
+EXTRACT_ALL             = YES
+EXTRACT_PRIVATE         = YES
+EXTRACT_STATIC          = YES
+EXTRACT_LOCAL_CLASSES   = YES
+JAVADOC_AUTOBRIEF       = NO
+
+# --- Output formats ---
+GENERATE_HTML           = YES
+GENERATE_LATEX          = NO
+GENERATE_XML            = NO
+
+# --- Diagrams (requires Graphviz's `dot`; auto-disabled if not found) ---
+HAVE_DOT                = YES
+CLASS_GRAPH             = YES
+COLLABORATION_GRAPH     = YES
+CALL_GRAPH               = NO
+CALLER_GRAPH             = NO
+DOT_IMAGE_FORMAT         = svg
+INTERACTIVE_SVG          = YES
+
+# --- Source browsing ---
+SOURCE_BROWSER           = YES
+INLINE_SOURCES           = NO
+REFERENCED_BY_RELATION   = YES
+REFERENCES_RELATION      = YES
+
+# --- Misc ---
+QUIET                    = YES
+WARN_IF_UNDOCUMENTED     = YES
+WARN_NO_PARAMDOC         = YES

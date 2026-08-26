@@ -39,3 +39,6 @@ perf.data*
 
 # Test output
 Testing/
+
+# Generated documentation (Doxygen)
+docs/generated/

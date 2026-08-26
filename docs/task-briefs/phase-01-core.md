@@ -1,6 +1,6 @@
 # Phase 01 — Core (`Robot` + `Joint`)
 
-**Status:** Not Started
+**Status:** Done
 **Prerequisites:** None (this is the first phase)
 
 ---
