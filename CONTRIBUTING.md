@@ -1,10 +1,10 @@
 # Contributing
 
-This project is developed in well-delimited, incrementally shippable phases. Each phase has a **task brief** in [`docs/task-briefs/`](docs/task-briefs/) — a self-contained specification meant to be handed to a human contributor **or an LLM** without requiring any other context than the brief itself plus the referenced sections of [`docs/architecture.md`](docs/architecture.md).
+This project is developed in well-delimited, incrementally shippable phases. Each phase has a **task brief** in [`docs/task-briefs/`](docs/task-briefs/) — a self-contained specification meant to be handed to a contributor without requiring any other context than the brief itself plus the referenced sections of [`docs/architecture.md`](docs/architecture.md).
 
 ## Why task briefs exist
 
-The goal is to let different phases be implemented independently — potentially by different people, or different LLM sessions/models — while still producing a codebase that fits together correctly the first time. A task brief is not a summary of a conversation; it's a standalone contract: context, exact interfaces, deliverables, and an explicit Definition of Done. If a brief is ambiguous enough that two different implementers could reasonably build incompatible things, the brief has a bug and should be fixed before implementation starts.
+The goal is to let different phases be implemented independently — potentially by different people, or in different sessions — while still producing a codebase that fits together correctly the first time. A task brief is not a summary of a conversation; it's a standalone contract: context, exact interfaces, deliverables, and an explicit Definition of Done. If a brief is ambiguous enough that two different implementers could reasonably build incompatible things, the brief has a bug and should be fixed before implementation starts.
 
 ## Workflow
 
@@ -40,7 +40,7 @@ Every `.hpp`, `.cpp`, `.cmake`, `CMakeLists.txt`, and script (`.sh`, `.py`) must
 
 (use `#` instead of `//` in shell/Python scripts)
 
-This applies regardless of who or what wrote the file — human contributor or LLM. `scripts/check-headers.sh` (once it exists) enforces this in CI.
+This applies regardless of who wrote the file — `scripts/check-headers.sh` (once it exists) enforces this in CI.
 
 ## Language policy
 

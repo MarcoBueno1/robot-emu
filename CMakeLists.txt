@@ -72,6 +72,21 @@ target_link_libraries(robot_runtime PUBLIC
 
 target_compile_features(robot_runtime PUBLIC cxx_std_23)
 
+# --- robot_motion: trajectory planning, depends only on robot_core ---
+add_library(robot_motion STATIC
+    src/motion/trapezoidal_trajectory.cpp
+)
+
+target_include_directories(robot_motion PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_motion PUBLIC
+    robot_core
+)
+
+target_compile_features(robot_motion PUBLIC cxx_std_23)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -119,6 +134,17 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_runtime_tests)
+
+    add_executable(robot_motion_tests
+        tests/motion/trapezoidal_trajectory_test.cpp
+    )
+
+    target_link_libraries(robot_motion_tests PRIVATE
+        robot_motion
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_motion_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---

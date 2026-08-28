@@ -2,7 +2,7 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Phases 1–3 implemented (core data model, controller state machine, real-time control loop). Phase 4 (motion) not yet started. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phases 1–4 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner). Phase 5 (virtual hardware) not yet started. See [Roadmap](#roadmap).
 
 ---
 
@@ -33,7 +33,7 @@ Full rationale in [`docs/architecture.md`](docs/architecture.md).
 | Document | Purpose |
 |---|---|
 | [`docs/architecture.md`](docs/architecture.md) | Full technical design: architecture, requirements, protocol, safety, roadmap |
-| [`docs/task-briefs/`](docs/task-briefs/) | Self-contained, phase-by-phase implementation briefs — each one is written so it can be handed to a contributor or an LLM without needing the rest of the project history |
+| [`docs/task-briefs/`](docs/task-briefs/) | Self-contained, phase-by-phase implementation briefs — each one is written so it can be handed to a contributor without needing the rest of the project history |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Coding standards, header policy, and how the phase/task-brief workflow works |
 
 ---
@@ -47,7 +47,7 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 | 1 | ✅ Core: `Robot` with N `Joint`s (position, velocity, limits) | [`phase-01-core.md`](docs/task-briefs/phase-01-core.md) |
 | 2 | ✅ Controller state machine | [`phase-02-controller-state-machine.md`](docs/task-briefs/phase-02-controller-state-machine.md) |
 | 3 | ✅ Deterministic real-time control loop (1 kHz) | [`phase-03-control-loop.md`](docs/task-briefs/phase-03-control-loop.md) |
-| 4 | Motion: trajectory, velocity, acceleration | _not written yet_ |
+| 4 | ✅ Motion: trajectory, velocity, acceleration | [`phase-04-motion.md`](docs/task-briefs/phase-04-motion.md) |
 | 5 | Virtual hardware: motor, encoder, brake, IO | _not written yet_ |
 | 6 | Binary protocol over TCP | _not written yet_ |
 | 7 | `robotctl` CLI | _not written yet_ |
