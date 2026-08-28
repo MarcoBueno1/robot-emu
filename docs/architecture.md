@@ -12,7 +12,7 @@ Most open-source "robot simulators" solve only the visual part: a 3D mesh moving
 
 The **Robot Emulator Framework** takes the inverse approach: emulate the *behavior of a real robot controller* — its network interface, its state machine, its sensors, its faults — and treat 3D visualization as an optional consumer, not the core of the system.
 
-**One-liner for the README / LinkedIn / resume:**
+**Summary:**
 
 > High-performance C++ framework that emulates the firmware/controller of an industrial robot — deterministic control loop, custom binary protocol, virtual hardware, fault injection, and automated tests — enabling control software to be developed and validated without physical hardware.
 
@@ -26,7 +26,7 @@ The **Robot Emulator Framework** takes the inverse approach: emulate the *behavi
 - Does not depend on ROS, Gazebo, or Webots in the core — those are, at most, optional integrations at the edge.
 - Not a GUI. Visualization is a protocol client, not part of the core.
 
-Making this explicit in the README prevents the project from being mistaken for "yet another Gazebo simulator" and communicates scope precision — something that scores well in technical evaluation.
+Making this explicit in the README prevents the project from being mistaken for "yet another Gazebo simulator" and keeps the project's scope precise.
 
 ---
 
@@ -176,7 +176,7 @@ POWER_OFF → BOOTING → INITIALIZING → IDLE → SERVO_ON → READY
 
 Formal states: `POWER_OFF, BOOTING, INITIALIZING, IDLE, SERVO_OFF, SERVO_ON, READY, MOVING, PAUSED, STOPPING, EMERGENCY_STOP, FAULT, RECOVERY, SHUTDOWN`.
 
-Implemented as an explicit state machine (transition table + guards), not a tangle of `if/else` — this is independently testable and exactly the kind of code that demonstrates maturity in a technical interview.
+Implemented as an explicit state machine (transition table + guards), not a tangle of `if/else` — this keeps it independently testable and easy to reason about.
 
 ### 3.5 Motor/joint model (per-cycle control loop)
 
@@ -225,7 +225,7 @@ Configurable frequency: `500 Hz | 1 kHz | 2 kHz | 5 kHz | 10 kHz`.
            repeat
 ```
 
-Metrics collected continuously and exposed via `GET_STATUS`/benchmark: average cycle time, jitter, *deadline misses*, CPU usage, command latency, throughput. This becomes the quantitative material for the README (section 6).
+Metrics collected continuously and exposed via `GET_STATUS`/benchmark: average cycle time, jitter, *deadline misses*, CPU usage, command latency, throughput. This becomes the quantitative material referenced in the Benchmark section (3.13).
 
 > Technical precision note: this is *soft real-time* (the goal is low latency and low jitter, measured and reported), not *hard real-time* with formal guarantees — unless run on a PREEMPT_RT kernel with dedicated CPU affinity. Worth making this distinction explicit in the documentation to avoid promising a guarantee the project doesn't provide.
 
@@ -382,7 +382,7 @@ Candidates for later: OpenGL, SDL, Vulkan, WebSocket + Web UI, bridge to Gazebo/
 
 ### 3.15 Functional Safety & MISRA C++
 
-The robot's safety system (E-stop, limits, watchdog — sections 3.4 and 3.9) is described so far in terms of **behavior**. This section defines the **engineering rigor** behind it — what separates "I know how to model an E-stop" from "I know how to model an E-stop in a way that would survive a safety-critical audit." It's also the section of the project with the strongest direct correlation to banking/industrial firmware experience, where a silent failure is not an option.
+The robot's safety system (E-stop, limits, watchdog — sections 3.4 and 3.9) is described so far in terms of **behavior**. This section defines the **engineering rigor** behind it — what separates "I know how to model an E-stop" from "I know how to model an E-stop in a way that would survive a safety-critical audit." This matters most in domains where a silent failure is not an option, such as industrial and safety-critical firmware.
 
 **Important to state explicitly in the README:** the project **is not certified** and **does not claim formal compliance** with ISO 26262 or with the full text of the MISRA C++ standard (which is licensed and cannot be reproduced or "fully implemented" without the MISRA association). What the project does is **adopt a subset of publicly known, tool-verified practices and rules** as an engineering discipline — an honest choice, common among open-source projects that want to demonstrate rigor without claiming a certification they don't hold.
 
@@ -556,31 +556,9 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 
 ---
 
-## 6. Why This Is Strong for a Resume/Portfolio
+## 6. License and File Header Policy
 
-Summary line for LinkedIn/CV:
-
-> Designed and implemented a high-performance C++ robotic controller emulator featuring a deterministic control loop, a custom binary network protocol, virtual hardware, motion planning, a safety system, fault injection, sensor simulation, automated testing, and performance benchmarking.
-
-Skills demonstrated, mapped to what Senior/Staff C++, Robotics, Embedded, and Systems roles actually evaluate:
-
-```
-Modern C++23 (std::expected, ranges, mdspan) · RAII · templates
-concurrency · atomics · memory management · networking · binary protocols
-state machines · real-time concepts
-Linux · CMake · GCC/Clang · multi-compiler CI
-testing · benchmarking · profiling · performance optimization
-functional safety discipline (MISRA C++, ISO 26262) · automated static analysis
-ROS2/robotics ecosystem integration without coupling the core to the middleware
-```
-
-Using the most recent stable standard and documenting *why* (alignment with Ubuntu 25.10's native toolchain, not trend-chasing) is, in itself, a sign of technical maturity — it shows the language choice was deliberate, not copied from another project.
-
----
-
-## 7. License and File Header Policy
-
-### 7.1 License
+### 6.1 License
 
 **MIT License.** This was the deliberate choice among permissive licenses because it best serves the project's goal: **anyone can use the code for any purpose — including commercial use, including inside closed-source proprietary software —** with the sole obligation of keeping the copyright notice and license text in copies of the software.
 
@@ -601,7 +579,7 @@ Copyright (c) 2026 Marco Bueno
 
 and a closing section with the author's contact information.
 
-### 7.2 Mandatory standard header in every code file
+### 6.2 Mandatory standard header in every code file
 
 Every `.hpp`, `.cpp`, `.cmake`, `CMakeLists.txt`, and script (`.sh`, `.py`) file in the project must start with the following block, right after the file-path identification line:
 
@@ -624,6 +602,6 @@ This header has already been applied to every file specified in the Phase 1 tech
 
 ---
 
-## 8. Recommended Next Step
+## 7. Recommended Next Step
 
 Before writing any code: finalize the technical design of **Phase 1** — class definitions, public interfaces, thread model, clock/timing strategy, and the initial `CMakeLists.txt` structure. This becomes the repository's first real commit and the foundation the following phases build on.

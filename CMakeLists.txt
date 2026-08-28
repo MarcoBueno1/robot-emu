@@ -23,6 +23,8 @@ endif()
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
+find_package(Threads REQUIRED)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ROBOT_EMULATOR_ENABLE_SANITIZERS)
     add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
     add_link_options(-fsanitize=address,undefined)
@@ -41,6 +43,34 @@ target_include_directories(robot_core PUBLIC
 )
 
 target_compile_features(robot_core PUBLIC cxx_std_23)
+
+# --- robot_controller: controller state machine, no dependency on robot_core ---
+add_library(robot_controller STATIC
+    src/controller/controller_state_machine.cpp
+)
+
+target_include_directories(robot_controller PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_compile_features(robot_controller PUBLIC cxx_std_23)
+
+# --- robot_runtime: control loop, depends on both robot_core and robot_controller ---
+add_library(robot_runtime STATIC
+    src/runtime/control_loop.cpp
+)
+
+target_include_directories(robot_runtime PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_runtime PUBLIC
+    robot_core
+    robot_controller
+    Threads::Threads
+)
+
+target_compile_features(robot_runtime PUBLIC cxx_std_23)
 
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
@@ -67,6 +97,28 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
 
     include(GoogleTest)
     gtest_discover_tests(robot_core_tests)
+
+    add_executable(robot_controller_tests
+        tests/controller/controller_state_machine_test.cpp
+    )
+
+    target_link_libraries(robot_controller_tests PRIVATE
+        robot_controller
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_controller_tests)
+
+    add_executable(robot_runtime_tests
+        tests/runtime/control_loop_test.cpp
+    )
+
+    target_link_libraries(robot_runtime_tests PRIVATE
+        robot_runtime
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_runtime_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---
