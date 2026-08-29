@@ -50,6 +50,11 @@ public:
     /// @brief Current torque, in N·m (placeholder until Phase 5 — Virtual Hardware).
     [[nodiscard]] double torque() const noexcept       { return state_.torque; }
 
+    /// @brief The position/velocity/acceleration limits this joint was
+    ///        constructed with. Added in Phase 8 for robot::safety::LimitMonitor
+    ///        — Phase 1 never needed to read a limit back, only enforce it.
+    [[nodiscard]] const JointLimits& limits() const noexcept { return limits_; }
+
     /// @brief Whether the joint is enabled. A disabled joint ignores its
     ///        target and does not move on update().
     [[nodiscard]] bool enabled() const noexcept { return enabled_; }

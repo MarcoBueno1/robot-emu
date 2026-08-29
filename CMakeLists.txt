@@ -147,6 +147,26 @@ target_link_libraries(robotctl PRIVATE
     robot_cli
 )
 
+# --- robot_safety: limits, E-stop, watchdog — combines robot_core, robot_controller, robot_hardware ---
+add_library(robot_safety STATIC
+    src/safety/limit_monitor.cpp
+    src/safety/emergency_stop_controller.cpp
+    src/safety/watchdog.cpp
+)
+
+target_include_directories(robot_safety PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_safety PUBLIC
+    robot_core
+    robot_controller
+    robot_hardware
+    Threads::Threads
+)
+
+target_compile_features(robot_safety PUBLIC cxx_std_23)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -245,6 +265,19 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_cli_tests)
+
+    add_executable(robot_safety_tests
+        tests/safety/limit_monitor_test.cpp
+        tests/safety/emergency_stop_controller_test.cpp
+        tests/safety/watchdog_test.cpp
+    )
+
+    target_link_libraries(robot_safety_tests PRIVATE
+        robot_safety
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_safety_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---

@@ -2,7 +2,7 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Phases 1–7 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP, `robotctl` CLI). Phase 8 (safety: limits, E-stop, watchdog) not yet started. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phases 1–8 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP, `robotctl` CLI, safety: limits/E-stop/watchdog). Phase 9 (sensors) not yet started. See [Roadmap](#roadmap).
 >
 > **Known gap:** `robotctl` has nothing real to connect to yet — `apps/robot-emulator` (the server that would actually own a `Robot`/`ControllerStateMachine`/`ControlLoop` and execute commands) hasn't been built. See [`phase-07-cli.md`](docs/task-briefs/phase-07-cli.md) Non-Goals.
 
@@ -53,7 +53,7 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 | 5 | ✅ Virtual hardware: motor, encoder, brake, IO | [`phase-05-virtual-hardware.md`](docs/task-briefs/phase-05-virtual-hardware.md) |
 | 6 | ✅ Binary protocol over TCP | [`phase-06-protocol.md`](docs/task-briefs/phase-06-protocol.md) |
 | 7 | ✅ `robotctl` CLI | [`phase-07-cli.md`](docs/task-briefs/phase-07-cli.md) |
-| 8 | Safety: limits, E-stop, watchdog | _not written yet_ |
+| 8 | ✅ Safety: limits, E-stop, watchdog | [`phase-08-safety.md`](docs/task-briefs/phase-08-safety.md) |
 | 9 | Sensors: encoder, temperature, current, force/torque | _not written yet_ |
 | 10 | Fault injection | _not written yet_ |
 | 11 | Performance optimization (measured) | _not written yet_ |
