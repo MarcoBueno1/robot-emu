@@ -2,7 +2,7 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Phases 1–5 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware). Phase 6 (binary protocol) not yet started. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phases 1–6 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP). Phase 7 (`robotctl` CLI) not yet started. See [Roadmap](#roadmap).
 
 ---
 
@@ -49,7 +49,7 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 | 3 | ✅ Deterministic real-time control loop (1 kHz) | [`phase-03-control-loop.md`](docs/task-briefs/phase-03-control-loop.md) |
 | 4 | ✅ Motion: trajectory, velocity, acceleration | [`phase-04-motion.md`](docs/task-briefs/phase-04-motion.md) |
 | 5 | ✅ Virtual hardware: motor, encoder, brake, IO | [`phase-05-virtual-hardware.md`](docs/task-briefs/phase-05-virtual-hardware.md) |
-| 6 | Binary protocol over TCP | _not written yet_ |
+| 6 | ✅ Binary protocol over TCP | [`phase-06-protocol.md`](docs/task-briefs/phase-06-protocol.md) |
 | 7 | `robotctl` CLI | _not written yet_ |
 | 8 | Safety: limits, E-stop, watchdog | _not written yet_ |
 | 9 | Sensors: encoder, temperature, current, force/torque | _not written yet_ |

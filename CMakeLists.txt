@@ -102,6 +102,23 @@ target_include_directories(robot_hardware PUBLIC
 
 target_compile_features(robot_hardware PUBLIC cxx_std_23)
 
+# --- robot_protocol: binary framing + TCP transport, no dependency on any other robot_* target ---
+add_library(robot_protocol STATIC
+    src/protocol/frame_codec.cpp
+    src/protocol/tcp_connection.cpp
+    src/protocol/tcp_listener.cpp
+)
+
+target_include_directories(robot_protocol PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_protocol PUBLIC
+    Threads::Threads
+)
+
+target_compile_features(robot_protocol PUBLIC cxx_std_23)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -174,6 +191,18 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_hardware_tests)
+
+    add_executable(robot_protocol_tests
+        tests/protocol/frame_codec_test.cpp
+        tests/protocol/tcp_test.cpp
+    )
+
+    target_link_libraries(robot_protocol_tests PRIVATE
+        robot_protocol
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_protocol_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---
