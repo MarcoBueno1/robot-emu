@@ -87,6 +87,21 @@ target_link_libraries(robot_motion PUBLIC
 
 target_compile_features(robot_motion PUBLIC cxx_std_23)
 
+# --- robot_hardware: virtual hardware, no dependency on any other robot_* target ---
+add_library(robot_hardware STATIC
+    src/hardware/virtual_motor.cpp
+    src/hardware/virtual_encoder.cpp
+    src/hardware/virtual_brake.cpp
+    src/hardware/digital_io.cpp
+    src/hardware/analog_io.cpp
+)
+
+target_include_directories(robot_hardware PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_compile_features(robot_hardware PUBLIC cxx_std_23)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -145,6 +160,20 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_motion_tests)
+
+    add_executable(robot_hardware_tests
+        tests/hardware/virtual_motor_test.cpp
+        tests/hardware/virtual_encoder_test.cpp
+        tests/hardware/virtual_brake_test.cpp
+        tests/hardware/io_test.cpp
+    )
+
+    target_link_libraries(robot_hardware_tests PRIVATE
+        robot_hardware
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_hardware_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---
