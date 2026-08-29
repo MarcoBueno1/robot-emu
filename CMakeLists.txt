@@ -119,6 +119,34 @@ target_link_libraries(robot_protocol PUBLIC
 
 target_compile_features(robot_protocol PUBLIC cxx_std_23)
 
+# --- robot_cli: robotctl's logic, depends only on robot_protocol ---
+add_library(robot_cli STATIC
+    src/cli/command.cpp
+    src/cli/status_payload.cpp
+    src/cli/move_joint_payload.cpp
+    src/cli/client.cpp
+    src/cli/format.cpp
+)
+
+target_include_directories(robot_cli PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_cli PUBLIC
+    robot_protocol
+)
+
+target_compile_features(robot_cli PUBLIC cxx_std_23)
+
+# --- robotctl: the actual CLI executable ---
+add_executable(robotctl
+    apps/robotctl/main.cpp
+)
+
+target_link_libraries(robotctl PRIVATE
+    robot_cli
+)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -203,6 +231,20 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_protocol_tests)
+
+    add_executable(robot_cli_tests
+        tests/cli/command_test.cpp
+        tests/cli/payload_test.cpp
+        tests/cli/format_test.cpp
+        tests/cli/client_test.cpp
+    )
+
+    target_link_libraries(robot_cli_tests PRIVATE
+        robot_cli
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_cli_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---
