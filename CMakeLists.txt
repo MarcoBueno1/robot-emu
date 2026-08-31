@@ -167,6 +167,24 @@ target_link_libraries(robot_safety PUBLIC
 
 target_compile_features(robot_safety PUBLIC cxx_std_23)
 
+# --- robot_sensors: encoder/temperature/current/proximity, depends only on robot_hardware ---
+add_library(robot_sensors STATIC
+    src/sensors/encoder_sensor.cpp
+    src/sensors/temperature_sensor.cpp
+    src/sensors/current_sensor.cpp
+    src/sensors/proximity_sensor.cpp
+)
+
+target_include_directories(robot_sensors PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_sensors PUBLIC
+    robot_hardware
+)
+
+target_compile_features(robot_sensors PUBLIC cxx_std_23)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -278,6 +296,20 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_safety_tests)
+
+    add_executable(robot_sensors_tests
+        tests/sensors/encoder_sensor_test.cpp
+        tests/sensors/temperature_sensor_test.cpp
+        tests/sensors/current_sensor_test.cpp
+        tests/sensors/proximity_sensor_test.cpp
+    )
+
+    target_link_libraries(robot_sensors_tests PRIVATE
+        robot_sensors
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_sensors_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---
