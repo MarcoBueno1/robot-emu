@@ -2,7 +2,7 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Phases 1–9 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP, `robotctl` CLI, safety, sensors). Phase 10 (fault injection) not yet started. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phases 1–10 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP, `robotctl` CLI, safety, sensors, fault injection). Phase 11 (performance optimization) not yet started. See [Roadmap](#roadmap).
 >
 > **Known gap:** `robotctl` has nothing real to connect to yet — `apps/robot-emulator` (the server that would actually own a `Robot`/`ControllerStateMachine`/`ControlLoop` and execute commands) hasn't been built. See [`phase-07-cli.md`](docs/task-briefs/phase-07-cli.md) Non-Goals.
 
@@ -55,7 +55,7 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 | 7 | ✅ `robotctl` CLI | [`phase-07-cli.md`](docs/task-briefs/phase-07-cli.md) |
 | 8 | ✅ Safety: limits, E-stop, watchdog | [`phase-08-safety.md`](docs/task-briefs/phase-08-safety.md) |
 | 9 | ✅ Sensors: encoder, temperature, current, proximity (force/torque deferred — see brief) | [`phase-09-sensors.md`](docs/task-briefs/phase-09-sensors.md) |
-| 10 | Fault injection | _not written yet_ |
+| 10 | ✅ Fault injection registry/dispatcher (not yet wired to real components — see brief) | [`phase-10-fault-injection.md`](docs/task-briefs/phase-10-fault-injection.md) |
 | 11 | Performance optimization (measured) | _not written yet_ |
 | 12 | Optional visualization | _not written yet_ |
 | 13 | *(optional, future)* ROS2 Bridge | _not written yet_ |

@@ -185,6 +185,18 @@ target_link_libraries(robot_sensors PUBLIC
 
 target_compile_features(robot_sensors PUBLIC cxx_std_23)
 
+# --- robot_fault: fault injection registry, no dependency on any other robot_* target ---
+add_library(robot_fault STATIC
+    src/fault/fault_type.cpp
+    src/fault/fault_injector.cpp
+)
+
+target_include_directories(robot_fault PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_compile_features(robot_fault PUBLIC cxx_std_23)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -310,6 +322,17 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_sensors_tests)
+
+    add_executable(robot_fault_tests
+        tests/fault/fault_injector_test.cpp
+    )
+
+    target_link_libraries(robot_fault_tests PRIVATE
+        robot_fault
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_fault_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---
