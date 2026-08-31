@@ -197,6 +197,22 @@ target_include_directories(robot_fault PUBLIC
 
 target_compile_features(robot_fault PUBLIC cxx_std_23)
 
+target_compile_features(robot_fault PUBLIC cxx_std_23)
+
+# --- robot-benchmark: real, measured performance report (section 3.13) ---
+add_executable(robot-benchmark
+    apps/robot-benchmark/main.cpp
+)
+
+target_link_libraries(robot-benchmark PRIVATE
+    robot_runtime
+    robot_sensors
+)
+
+target_compile_definitions(robot-benchmark PRIVATE
+    ROBOT_BENCHMARK_BUILD_TYPE="$<CONFIG>"
+)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()

@@ -2,7 +2,7 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Phases 1–10 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP, `robotctl` CLI, safety, sensors, fault injection). Phase 11 (performance optimization) not yet started. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phases 1–11 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP, `robotctl` CLI, safety, sensors, fault injection, measured benchmark). Phase 12 (optional visualization) not yet started. See [Roadmap](#roadmap).
 >
 > **Known gap:** `robotctl` has nothing real to connect to yet — `apps/robot-emulator` (the server that would actually own a `Robot`/`ControllerStateMachine`/`ControlLoop` and execute commands) hasn't been built. See [`phase-07-cli.md`](docs/task-briefs/phase-07-cli.md) Non-Goals.
 
@@ -37,6 +37,7 @@ Full rationale in [`docs/architecture.md`](docs/architecture.md).
 | [`docs/architecture.md`](docs/architecture.md) | Full technical design: architecture, requirements, protocol, safety, roadmap |
 | [`docs/task-briefs/`](docs/task-briefs/) | Self-contained, phase-by-phase implementation briefs — each one is written so it can be handed to a contributor without needing the rest of the project history |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Coding standards, header policy, and how the phase/task-brief workflow works |
+| [Benchmark](#benchmark) | Real, measured performance numbers for the core control-loop/sensor workload |
 
 ---
 
@@ -56,12 +57,39 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 | 8 | ✅ Safety: limits, E-stop, watchdog | [`phase-08-safety.md`](docs/task-briefs/phase-08-safety.md) |
 | 9 | ✅ Sensors: encoder, temperature, current, proximity (force/torque deferred — see brief) | [`phase-09-sensors.md`](docs/task-briefs/phase-09-sensors.md) |
 | 10 | ✅ Fault injection registry/dispatcher (not yet wired to real components — see brief) | [`phase-10-fault-injection.md`](docs/task-briefs/phase-10-fault-injection.md) |
-| 11 | Performance optimization (measured) | _not written yet_ |
+| 11 | ✅ Performance optimization (measured) | [`phase-11-benchmark.md`](docs/task-briefs/phase-11-benchmark.md) |
 | 12 | Optional visualization | _not written yet_ |
 | 13 | *(optional, future)* ROS2 Bridge | _not written yet_ |
 | 14 | *(optional, future)* Secure Communication Layer | _not written yet_ |
 
 Static analysis (MISRA C++ subset, `clang-tidy`, `lizard`) runs from Phase 1 onward, across every phase. See `docs/architecture.md` section 3.15.
+
+---
+
+## Benchmark
+
+Real, measured numbers from `apps/robot-benchmark` — a 6-joint, 24-sensor scenario driving `ControlLoop::step()` for 100,000 cycles, following the exact methodology in [`phase-11-benchmark.md`](docs/task-briefs/phase-11-benchmark.md). Deadline misses are 0 by construction: this benchmark measures the workload's own computational cost directly (unpaced), not a real-time-paced background loop — see the brief for why.
+
+```
+Robot Emulator Benchmark
+-------------------------
+CPU: Intel(R) Xeon(R) Processor @ 2.10GHz | OS: Ubuntu 24.04.4 LTS | Compiler: GCC 13.3.0 (-std=c++23) | Build: Release
+Control frequency: 1 kHz
+
+Joints:              6
+Sensors:             24
+
+CPU:                 0.0%
+Memory:              4.2 MB
+Average cycle:       0.19 us
+P99 cycle:           0.27 us
+P99.9 cycle:         0.47 us
+Deadline misses:     0 (unpaced measurement loop — see task brief Non-Goals)
+```
+
+**Environment caveat:** measured in this repository's actual sandbox/CI-style container (single-core virtualized Intel Xeon, not a dedicated multi-core workstation) — different from `docs/architecture.md` section 3.13's own illustrative example (`AMD Ryzen 7 | Ubuntu 25.10 | GCC 15.2`). Every number above is real and reproducible by running `robot-benchmark` yourself; it is not a representative absolute number for a dedicated deployment target, only a real measurement of this codebase's relative efficiency.
+
+**Conclusion (measured, not guessed):** a 1 kHz control loop has a 1000 µs period per cycle. This scenario's average cycle (~0.19 µs, ~0.02% of that budget) shows the existing design choices made throughout Phases 1–10 — no heap allocation on any hot path, exact analytic solutions instead of iterative approximations (`VirtualMotor`, `TemperatureSensor`), a flat array instead of a hash map for `ControllerStateMachine`'s small transition table — already leave enormous headroom. No optimization was made in this phase: the data didn't support one, and inventing a change without that support would violate section 3.13's own "never estimated" principle. Run `robot-benchmark` yourself (`cmake --build build-release --target robot-benchmark && ./build-release/robot-benchmark`, built with `-DCMAKE_BUILD_TYPE=Release`) to reproduce.
 
 ---
 
