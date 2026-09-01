@@ -14,8 +14,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(ROBOT_EMULATOR_BUILD_TESTS "Build unit tests" ON)
-option(ROBOT_EMULATOR_ENABLE_SANITIZERS "Enable ASan/UBSan in Debug builds" ON)
+option(ROBOT_EMULATOR_ENABLE_SANITIZERS "Enable sanitizers in Debug builds" ON)
 option(ROBOT_EMULATOR_EXPERIMENTAL_CXX26 "Enable experimental C++26 features (GCC 15)" OFF)
+# ASan and TSan cannot be combined in one build (compiler-level restriction).
+# "address" (default) catches memory errors/leaks/most UB; "thread" catches
+# data races instead — build separately with -DROBOT_EMULATOR_SANITIZER=thread
+# to validate concurrency-sensitive code (e.g. apps/robot-emulator's shared
+# Robot/ControllerStateMachine, guarded by one std::mutex across three
+# threads — see docs/task-briefs/server-integration.md section 6.2).
+set(ROBOT_EMULATOR_SANITIZER "address" CACHE STRING "Sanitizer set for Debug builds: address or thread")
+set_property(CACHE ROBOT_EMULATOR_SANITIZER PROPERTY STRINGS address thread)
 
 if(ROBOT_EMULATOR_EXPERIMENTAL_CXX26)
     set(CMAKE_CXX_STANDARD 26)
@@ -26,8 +34,13 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 find_package(Threads REQUIRED)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND ROBOT_EMULATOR_ENABLE_SANITIZERS)
-    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
-    add_link_options(-fsanitize=address,undefined)
+    if(ROBOT_EMULATOR_SANITIZER STREQUAL "thread")
+        add_compile_options(-fsanitize=thread,undefined -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=thread,undefined)
+    else()
+        add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=address,undefined)
+    endif()
 endif()
 
 # --- robot_core: domain library, no external dependencies ---
@@ -213,6 +226,37 @@ target_compile_definitions(robot-benchmark PRIVATE
     ROBOT_BENCHMARK_BUILD_TYPE="$<CONFIG>"
 )
 
+# --- robot_server: real command dispatch logic, no networking/threading of its own ---
+add_library(robot_server STATIC
+    src/server/command_dispatcher.cpp
+)
+
+target_include_directories(robot_server PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_server PUBLIC
+    robot_core
+    robot_controller
+    robot_hardware
+    robot_protocol
+    robot_cli
+    robot_safety
+)
+
+target_compile_features(robot_server PUBLIC cxx_std_23)
+
+# --- robot-emulator: the real server (fills the "known gap" flagged since Phase 7) ---
+add_executable(robot-emulator
+    apps/robot-emulator/main.cpp
+)
+
+target_link_libraries(robot-emulator PRIVATE
+    robot_server
+    robot_runtime
+    Threads::Threads
+)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -349,6 +393,17 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_fault_tests)
+
+    add_executable(robot_server_tests
+        tests/server/command_dispatcher_test.cpp
+    )
+
+    target_link_libraries(robot_server_tests PRIVATE
+        robot_server
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_server_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---

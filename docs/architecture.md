@@ -393,7 +393,7 @@ The robot's safety system (E-stop, limits, watchdog — sections 3.4 and 3.9) is
 | No dynamic allocation on the control path (`Joint::update`, `Robot::update`) | Already a Phase 1 requirement (see the "Definition of Done" in the phase design doc); validated with `valgrind --tool=massif` in CI |
 | No exceptions in the control core | Reinforces the decision already made to use `std::expected` instead of `throw` (see Phase 1 design) — a classic MISRA-like rule (no `throw` outside the I/O boundary) |
 | No `goto`, no dangerous implicit conversions, no unchecked pointer arithmetic | Verified by automated static analysis (below), not by manual review |
-| Every variable explicitly initialized; no UB from reading uninitialized memory | Sanitizers (`-fsanitize=address,undefined`) are already part of the Debug build (Phase 1) — they complement, not replace, static analysis |
+| Every variable explicitly initialized; no UB from reading uninitialized memory | Sanitizers (`-fsanitize=address,undefined`) are already part of the Debug build (Phase 1) — they complement, not replace, static analysis. ASan/UBSan cannot detect data races; for concurrency-sensitive code (any component spanning multiple threads, e.g. `apps/robot-emulator`'s shared `Robot`/`ControllerStateMachine`), build with `-DROBOT_EMULATOR_SANITIZER=thread` instead (ASan and TSan cannot be combined in one build) |
 | Small functions, single responsibility, bounded cyclomatic complexity | Measured with `lizard` or `pmccabe` in CI, with a configurable limit (e.g. CCN ≤ 15) |
 | Explicit `const`-correctness and `noexcept` where applicable | Already an adopted convention since Phase 1 (`Joint`/`Robot`) |
 | Safety watchdog independent from the main control loop | Already anticipated in section 3.4 (`FAULT` state); here it gains the additional requirement of running on a separate thread, so a control-loop lockup doesn't prevent fault detection |
@@ -531,7 +531,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)   # pure -std=c++23, not gnu++23
 option(ROBOT_EMULATOR_EXPERIMENTAL_CXX26 "Enable experimental C++26 features (GCC 15)" OFF)
 ```
 
-Recommended CI: matrix with `gcc-15` and `clang-20` (both available in Ubuntu 25.10's repositories), `Release` and `Debug` builds, sanitizers (`-fsanitize=address,undefined`) in the Debug build.
+Recommended CI: matrix with `gcc-15` and `clang-20` (both available in Ubuntu 25.10's repositories), `Release` and `Debug` builds, sanitizers (`-fsanitize=address,undefined` by default; `-DROBOT_EMULATOR_SANITIZER=thread` as a separate matrix leg for concurrency-sensitive components, since ASan and TSan cannot be combined in one build) in the Debug build.
 
 ## 5. Incremental Roadmap
 

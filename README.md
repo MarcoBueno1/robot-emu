@@ -2,9 +2,9 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Phases 1–11 implemented (core data model, controller state machine, real-time control loop, trapezoidal trajectory planner, virtual hardware, binary protocol over TCP, `robotctl` CLI, safety, sensors, fault injection, measured benchmark). Phase 12 (optional visualization) not yet started. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phases 1–11 implemented, plus the `apps/robot-emulator` server integration (see below). Phase 12 (optional visualization) not yet started. See [Roadmap](#roadmap).
 >
-> **Known gap:** `robotctl` has nothing real to connect to yet — `apps/robot-emulator` (the server that would actually own a `Robot`/`ControllerStateMachine`/`ControlLoop` and execute commands) hasn't been built. See [`phase-07-cli.md`](docs/task-briefs/phase-07-cli.md) Non-Goals.
+> `robotctl` (Phase 7) now works end-to-end against a real running server: `apps/robot-emulator` owns a live `Robot`/`ControllerStateMachine`/`ControlLoop`, dispatches the seven commands `robotctl` sends, and enforces emergency stop and watchdog-triggered safety. See [`server-integration.md`](docs/task-briefs/server-integration.md).
 
 ---
 
@@ -30,6 +30,22 @@ Full rationale in [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
+## Quick Start
+
+```bash
+mkdir -p build-release && cd build-release
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . -j$(nproc)
+
+./robot-emulator 9000 &          # starts the server, 6-joint scenario, port 9000
+./robotctl 127.0.0.1:9000 status
+./robotctl 127.0.0.1:9000 enable
+./robotctl 127.0.0.1:9000 move-joint 2 45
+./robotctl 127.0.0.1:9000 status
+```
+
+---
+
 ## Documentation
 
 | Document | Purpose |
@@ -38,6 +54,7 @@ Full rationale in [`docs/architecture.md`](docs/architecture.md).
 | [`docs/task-briefs/`](docs/task-briefs/) | Self-contained, phase-by-phase implementation briefs — each one is written so it can be handed to a contributor without needing the rest of the project history |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Coding standards, header policy, and how the phase/task-brief workflow works |
 | [Benchmark](#benchmark) | Real, measured performance numbers for the core control-loop/sensor workload |
+| [`server-integration.md`](docs/task-briefs/server-integration.md) | How `apps/robot-emulator` wires everything together, including its concurrency design |
 
 ---
 
