@@ -257,6 +257,33 @@ target_link_libraries(robot-emulator PRIVATE
     Threads::Threads
 )
 
+# --- robot_websocket: minimal RFC 6455 subset, built on robot_protocol ---
+add_library(robot_websocket STATIC
+    src/websocket/sha1.cpp
+    src/websocket/base64.cpp
+    src/websocket/websocket_connection.cpp
+)
+
+target_include_directories(robot_websocket PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(robot_websocket PUBLIC
+    robot_protocol
+)
+
+target_compile_features(robot_websocket PUBLIC cxx_std_23)
+
+# --- robot-viewer: external protocol client (section 3.14), never linked into the core ---
+add_executable(robot-viewer
+    apps/robot-viewer/main.cpp
+)
+
+target_link_libraries(robot-viewer PRIVATE
+    robot_cli
+    robot_websocket
+)
+
 # --- Tests ---
 if(ROBOT_EMULATOR_BUILD_TESTS)
     enable_testing()
@@ -404,6 +431,19 @@ if(ROBOT_EMULATOR_BUILD_TESTS)
     )
 
     gtest_discover_tests(robot_server_tests)
+
+    add_executable(robot_websocket_tests
+        tests/websocket/sha1_test.cpp
+        tests/websocket/base64_test.cpp
+        tests/websocket/websocket_connection_test.cpp
+    )
+
+    target_link_libraries(robot_websocket_tests PRIVATE
+        robot_websocket
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(robot_websocket_tests)
 endif()
 
 # --- Documentation (optional: only registered if Doxygen is installed) ---
@@ -415,4 +455,14 @@ if(DOXYGEN_FOUND)
         COMMENT "Generating API documentation with Doxygen -> docs/generated/html/index.html"
         VERBATIM
     )
+endif()
+
+# --- ROS2 bridge (Phase 13, docs/architecture.md section 3.16) ---
+# OFF by default: this project has no ROS2 dependency otherwise, and this
+# block must never affect a build where ROS2 isn't installed or wanted.
+# NOT build-verified in this repository's own CI/development environment —
+# see docs/task-briefs/phase-13-ros2-bridge.md's warning before relying on it.
+option(ROBOT_EMULATOR_BUILD_ROS2_BRIDGE "Build the ros2_control hardware_interface plugin (requires ROS2)" OFF)
+if(ROBOT_EMULATOR_BUILD_ROS2_BRIDGE)
+    add_subdirectory(bridges/ros2_bridge)
 endif()

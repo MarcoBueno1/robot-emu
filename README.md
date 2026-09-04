@@ -2,9 +2,9 @@
 
 A high-performance industrial robot controller emulator written in modern C++, with no heavy runtime dependencies.
 
-> **Status:** 🚧 Phases 1–11 implemented, plus the `apps/robot-emulator` server integration (see below). Phase 12 (optional visualization) not yet started. See [Roadmap](#roadmap).
+> **Status:** 🚧 Phases 1–12 implemented and verified; Phase 13 (ROS2 bridge) written but **not build-verified** — see [Roadmap](#roadmap) and [`phase-13-ros2-bridge.md`](docs/task-briefs/phase-13-ros2-bridge.md).
 >
-> `robotctl` (Phase 7) now works end-to-end against a real running server: `apps/robot-emulator` owns a live `Robot`/`ControllerStateMachine`/`ControlLoop`, dispatches the seven commands `robotctl` sends, and enforces emergency stop and watchdog-triggered safety. See [`server-integration.md`](docs/task-briefs/server-integration.md).
+> `robotctl` (Phase 7) works end-to-end against a real running server: `apps/robot-emulator` owns a live `Robot`/`ControllerStateMachine`/`ControlLoop`, dispatches the seven commands `robotctl` sends, and enforces emergency stop and watchdog-triggered safety. See [`server-integration.md`](docs/task-briefs/server-integration.md). `apps/robot-viewer` (Phase 12) adds a live browser view on top of the same server.
 
 ---
 
@@ -42,6 +42,9 @@ cmake --build . -j$(nproc)
 ./robotctl 127.0.0.1:9000 enable
 ./robotctl 127.0.0.1:9000 move-joint 2 45
 ./robotctl 127.0.0.1:9000 status
+
+./robot-viewer 9000 9001 &       # connects to the emulator above, serves ws://127.0.0.1:9001
+# then open apps/robot-viewer/index.html in a browser to watch the joints move live
 ```
 
 ---
@@ -75,8 +78,8 @@ Each phase delivers something that compiles, runs, and is testable — no "big b
 | 9 | ✅ Sensors: encoder, temperature, current, proximity (force/torque deferred — see brief) | [`phase-09-sensors.md`](docs/task-briefs/phase-09-sensors.md) |
 | 10 | ✅ Fault injection registry/dispatcher (not yet wired to real components — see brief) | [`phase-10-fault-injection.md`](docs/task-briefs/phase-10-fault-injection.md) |
 | 11 | ✅ Performance optimization (measured) | [`phase-11-benchmark.md`](docs/task-briefs/phase-11-benchmark.md) |
-| 12 | Optional visualization | _not written yet_ |
-| 13 | *(optional, future)* ROS2 Bridge | _not written yet_ |
+| 12 | ✅ Visualization: `robot-viewer` (WebSocket + Web UI) | [`phase-12-visualization.md`](docs/task-briefs/phase-12-visualization.md) |
+| 13 | ⚠️ ROS2 Bridge — written, **not build-verified** (ROS2 unavailable in dev environment; see brief) | [`phase-13-ros2-bridge.md`](docs/task-briefs/phase-13-ros2-bridge.md) |
 | 14 | *(optional, future)* Secure Communication Layer | _not written yet_ |
 
 Static analysis (MISRA C++ subset, `clang-tidy`, `lizard`) runs from Phase 1 onward, across every phase. See `docs/architecture.md` section 3.15.
@@ -115,6 +118,7 @@ Deadline misses:     0 (unpaced measurement loop — see task brief Non-Goals)
 - **Language:** C++23
 - **Compiler:** GCC 15+ (Ubuntu 25.10 default) or Clang 20+
 - **Build system:** CMake ≥ 3.25
+- **Optional:** ROS2 (Humble or newer) + `ros2_control`, only if building `bridges/ros2_bridge` with `-DROBOT_EMULATOR_BUILD_ROS2_BRIDGE=ON`. **This bridge is written but not build-verified** — see [`phase-13-ros2-bridge.md`](docs/task-briefs/phase-13-ros2-bridge.md) before relying on it. Every other target builds and passes its tests with no ROS2 installed at all.
 
 ---
 

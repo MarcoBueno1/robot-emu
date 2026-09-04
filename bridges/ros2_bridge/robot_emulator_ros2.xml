@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+  bridges/ros2_bridge/robot_emulator_ros2.xml
+  -----------------------------------------------------------------------------
+  Robot Emulator Framework
+  -----------------------------------------------------------------------------
+  Author:   Marco Bueno
+  Email:    bueno.marco@gmail.com
+  LinkedIn: https://www.linkedin.com/in/marco-bueno-44417981/
+  License:  MIT (see LICENSE file at project root)
+  -----------------------------------------------------------------------------
+  NOT build-verified — see docs/task-briefs/phase-13-ros2-bridge.md.
+  pluginlib plugin description, registering RobotEmulatorHardwareInterface
+  as a hardware_interface::SystemInterface implementation, loadable by
+  ros2_control's controller_manager via its ros2_control URDF <plugin> tag.
+-->
+<library path="robot_emulator_ros2">
+  <class name="robot_emulator_ros2/RobotEmulatorHardwareInterface"
+         type="robot_emulator_ros2::RobotEmulatorHardwareInterface"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Connects to a running apps/robot-emulator over the binary TCP protocol
+      (docs/architecture.md section 3.7) via robot::cli::Client, exposing its
+      joints as standard ros2_control position/velocity state interfaces and
+      a position command interface.
+    </description>
+  </class>
+</library>

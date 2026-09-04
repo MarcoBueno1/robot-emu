@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+  bridges/ros2_bridge/package.xml
+  -----------------------------------------------------------------------------
+  Robot Emulator Framework
+  -----------------------------------------------------------------------------
+  Author:   Marco Bueno
+  Email:    bueno.marco@gmail.com
+  LinkedIn: https://www.linkedin.com/in/marco-bueno-44417981/
+  License:  MIT (see LICENSE file at project root)
+  -----------------------------------------------------------------------------
+  NOT build-verified — see docs/task-briefs/phase-13-ros2-bridge.md. Written
+  against this project's best knowledge of the ament_cmake package.xml
+  format (schema "3"); not validated with a real `ros2 pkg` toolchain.
+-->
+<package format="3">
+  <name>robot_emulator_ros2</name>
+  <version>0.1.0</version>
+  <description>
+    ros2_control SystemInterface plugin for the Robot Emulator Framework —
+    connects to a running apps/robot-emulator over its binary TCP protocol,
+    reusing robot::cli::Client exactly as robotctl does. See
+    docs/architecture.md section 3.16.
+  </description>
+  <maintainer email="bueno.marco@gmail.com">Marco Bueno</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+  <depend>hardware_interface</depend>
+  <depend>pluginlib</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

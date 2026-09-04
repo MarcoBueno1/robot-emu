@@ -1,0 +1,104 @@
+<!--
+  apps/robot-viewer/index.html
+  -----------------------------------------------------------------------------
+  Robot Emulator Framework
+  -----------------------------------------------------------------------------
+  Author:   Marco Bueno
+  Email:    bueno.marco@gmail.com
+  LinkedIn: https://www.linkedin.com/in/marco-bueno-44417981/
+  License:  MIT (see LICENSE file at project root)
+  -----------------------------------------------------------------------------
+  A diagnostic viewer, not a product UI: no build step, no framework, one
+  <script> tag, plain CanvasRenderingContext2D calls. Open this file
+  directly in a browser (file://) while apps/robot-viewer is running.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Robot Emulator Viewer</title>
+<style>
+  body { font-family: monospace; background: #1e1e1e; color: #ddd; margin: 0; padding: 20px; }
+  h1 { font-size: 16px; font-weight: normal; color: #9cdcfe; }
+  #status { margin-bottom: 12px; }
+  #status .state { color: #4ec9b0; font-weight: bold; }
+  canvas { background: #252526; border: 1px solid #444; }
+  table { border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+  td, th { padding: 4px 12px; text-align: right; border-bottom: 1px solid #333; }
+  th { color: #9cdcfe; text-align: right; }
+</style>
+</head>
+<body>
+  <h1>Robot Emulator Viewer</h1>
+  <div id="status">Connecting to ws://127.0.0.1:9001 ...</div>
+  <canvas id="canvas" width="480" height="220"></canvas>
+  <table id="table"><thead>
+    <tr><th>Joint</th><th>Position (deg)</th><th>Velocity (deg/s)</th></tr>
+  </thead><tbody></tbody></table>
+
+<script>
+const statusEl = document.getElementById('status');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const tbody = document.querySelector('#table tbody');
+
+function draw(data) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const joints = data.joints || [];
+  const barWidth = canvas.width / Math.max(joints.length, 1);
+
+  joints.forEach((joint, i) => {
+    const cx = barWidth * i + barWidth / 2;
+    const cy = canvas.height / 2;
+    const len = 80;
+    const angleRad = (joint.position_deg || 0) * Math.PI / 180;
+
+    // one rotating bar per joint, angle = its live position
+    ctx.strokeStyle = '#4ec9b0';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + len * Math.sin(angleRad), cy - len * Math.cos(angleRad));
+    ctx.stroke();
+
+    ctx.fillStyle = '#666';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
+    ctx.fill();
+
+    ctx.fillStyle = '#9cdcfe';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('J' + (i + 1), cx, canvas.height - 8);
+  });
+
+  tbody.innerHTML = joints.map((j, i) =>
+    `<tr><td>J${i + 1}</td><td>${(j.position_deg || 0).toFixed(2)}</td><td>${(j.velocity_deg_s || 0).toFixed(2)}</td></tr>`
+  ).join('');
+}
+
+function connect() {
+  const ws = new WebSocket('ws://127.0.0.1:9001');
+
+  ws.onopen = () => {
+    statusEl.innerHTML = 'Connected — <span class="state">waiting for data</span>';
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    statusEl.innerHTML = 'State: <span class="state">' + data.state + '</span>';
+    draw(data);
+  };
+
+  ws.onclose = () => {
+    statusEl.textContent = 'Disconnected — retrying in 2s...';
+    setTimeout(connect, 2000);
+  };
+
+  ws.onerror = () => ws.close();
+}
+
+connect();
+</script>
+</body>
+</html>
